@@ -2,4 +2,4 @@
 ## Introducción
 
 
-escribir  la memoria de laboratorio Prueba de cambioo
+escribir  la memoria de laboratorio prueba de cambio 1
