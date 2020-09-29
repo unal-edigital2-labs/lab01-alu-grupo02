@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 module multiplicador( input [2:0] MR, 
 							 input [2:0] MD, 
-							input init, 
+							 input init, 
 							 input clk,  
 							 output reg [5:0] pp, 
 							 output reg done
@@ -72,11 +72,13 @@ end
 // FSM 
 parameter START =0,  CHECK =1, ADD =2, SHIFT =3, END1 =4;
 
+reg[26:0] cfreq=0;
 always @(posedge clk) begin
 	case (status)
 	START: begin
 		sh=0;
 		add=0;
+		cfreq=0;
 		if (init) begin
 			status=CHECK;
 			done =0;
@@ -115,7 +117,10 @@ always @(posedge clk) begin
 		rst =0;
 		sh =0;
 		add =0;
+		if(cfreq[26])
 		status =START;
+		else
+		cfreq=cfreq+1;
 	end
 	 default:
 		status =START;
