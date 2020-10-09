@@ -19,11 +19,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module divisor( input [2:0] DV,
-							 input [2:0] DR,
-							input init,
-							 input clk,
-							 output reg [5:0] pp,
-							 output reg done
+							  input [2:0] DR,
+							  input init,
+							  input clk,
+							  output reg [5:0] pp,
+							  output reg done
     );
 
 reg sh;
@@ -31,13 +31,12 @@ reg rst;
 reg add;
 reg count;
 reg [5:0] A;
-reg [2:0] B;
 wire z;
 
 reg [2:0] status =0;
 
 // bloque comparador
-assign z=(B==0)?1:0;
+assign z=(A[2]==0)?1:0;
 
 
 //bloques de registros de desplazamiento para A y B
@@ -76,51 +75,72 @@ parameter START =0,  CHECK =1, ADD =2, SHIFT_DEC =3, END1 =4;
 always @(posedge clk) begin
 	case (status)
 	START: begin
-		SH=0;
-		DONE=0;
-		LDA=0
-		if (START) begin
+		done=0;
+		lda=0;
+		init=1;
+		dv0=0;
+    sh=0;
+		dec=0;
+		if (init) begin
 			status=SHIFT_DEC;
-			DONE =0;
-			rst=1;
 		end
 		end
 	CHECK: begin
-		done=0;
-		rst=0;
-		sh=0;
-		add=0;
-		if (B[0]==1)
-			status=ADD;
-		else
-			status=SHIFT;
+	done=0;
+	lda=0;
+	init=0;
+	dv0=0;
+	sh=0;
+	dec=0;
+		if (z==0) begin
+		   if (A[2]==0)begin
+			 status=ADD;
+			 end
+			 if (A[2]==1)begin
+			 status=SHIFT_DEC;
+			 end
 		end
+		else begin
+		status=END1;
+		end
+		end
+
 	ADD: begin
-		done=0;
-		rst=0;
-		sh=0;
-		add=1;
-		status=SHIFT;
-		end
+	done=0;
+	lda=1;
+	init=0;
+	dv0=1;
+	sh=0;
+	dec=0;
+	if (z==0)begin
+	  status=SHIFT_DEC;
+	end
+	else begin
+	  status=END1;
+	end
+	end
+
 	SHIFT_DEC: begin
-		done=0;
-		rst=0;
-		sh=1;
-		add=0;
-		if (z==1)
-			status=END1;
-		else
-			status=CHECK;
-		end
+	done=0;
+	lda=0;
+	init=0;
+	dv0=dv0;
+	sh=1;
+	dec=1;
+	status=CHECK;
+	end
+
 	END1: begin
-		done =1;
-		rst =0;
-		sh =0;
-		add =0;
-		status =START;
+	done=1;
+	lda=0;
+	init=0;
+	dv0=0;
+	sh=0;
+	dec=0;
 	end
 	 default:
 		status =START;
+
 	endcase
 
 end
